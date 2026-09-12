@@ -1,27 +1,20 @@
-import type { Metadata } from "next";
-import { Web3Provider } from "@/components/web3/Web3Provider";
-import { Toaster } from "sonner";
-import "./globals.css";
+
+import type { Metadata, Viewport } from 'next'
+import './globals.css'
 
 export const metadata: Metadata = {
-  title: "AltiPay Protocol — Custodia Comercial y Encomiendas (PayFi)",
-  description:
-    "Infraestructura no custodial de pagos en stablecoins garantizados para encomiendas terrestres en Bolivia.",
-};
+  title: 'Altipay — Protected payments, made simple',
+  description: 'A trusted escrow dashboard for secure Web3 payments with Altipay.',
+  generator: 'v0.app',
+  icons: { icon: '/icon.svg', apple: '/apple-icon.png' },
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="es" className="dark">
-      <body className="antialiased selection:bg-brand-500 selection:text-white">
-        <Web3Provider>
-          {children}
-          <Toaster richColors position="top-right" theme="dark" />
-        </Web3Provider>
-      </body>
-    </html>
-  );
+export const viewport: Viewport = {
+  colorScheme: 'dark',
+  themeColor: '#080b0d',
+  userScalable: false,
+}
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <html lang="en" className="bg-background"><body className="antialiased">{children}</body></html>
 }
