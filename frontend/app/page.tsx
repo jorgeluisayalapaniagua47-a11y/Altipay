@@ -88,7 +88,7 @@ const initialDemoEscrows: DemoEscrowItem[] = [
 export default function HomePage() {
   const { isConnected, address, chainId } = useAccount();
   const { balance, claimFaucet, isApproving, approveEscrow, hasSufficientAllowance } = useUSDC();
-  const { isVIP, feePercent } = useUnlockVIP();
+  const { isVIP, feePercent, calculateFee } = useUnlockVIP();
   const { createOrder, confirmDispatch, confirmDeliveryWithSecret, isSubmitting } = useAltiPayEscrow();
 
   // Pestaña de navegación activa
@@ -100,6 +100,9 @@ export default function HomePage() {
   const [amountUSDC, setAmountUSDC] = useState<string>("150");
   const [secretPin, setSecretPin] = useState<string>("ALTI-8492");
   const [description, setDescription] = useState<string>("Encomienda repuestos - Terminal La Paz a Cochabamba");
+
+  // Desglose de comisiones dinámicas Unlock Protocol
+  const feeDetails = useMemo(() => calculateFee(amountUSDC), [amountUSDC, isVIP, calculateFee]);
 
   // Estados para despacho y entrega
   const [activeOrderId, setActiveOrderId] = useState<string>("");
@@ -588,6 +591,37 @@ export default function HomePage() {
                   />
                 </div>
 
+                {/* Desglose dinámico de comisiones Unlock Protocol */}
+                <div className="p-4 rounded-xl bg-surface-darker border border-surface-border space-y-2.5 text-xs">
+                  <div className="flex justify-between text-slate-300">
+                    <span>Monto de mercadería:</span>
+                    <span className="font-semibold text-white">{feeDetails.subtotal.toFixed(2)} USDC</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span className="flex items-center gap-1.5">
+                      <span>Comisión de custodia ({feeDetails.feePercent}%):</span>
+                      {isVIP && (
+                        <span className="text-[10px] font-extrabold text-amber-300 px-1.5 py-0.2 rounded bg-amber-400/20 border border-amber-400/30">
+                          UNLOCK VIP 0%
+                        </span>
+                      )}
+                    </span>
+                    <span className={isVIP ? "text-emerald-400 font-bold" : "text-white font-medium"}>
+                      {isVIP ? "0.00 USDC (Exento)" : `${feeDetails.feeAmount.toFixed(2)} USDC`}
+                    </span>
+                  </div>
+                  {isVIP && (
+                    <div className="flex justify-between text-emerald-400 text-[11px] font-semibold border-t border-surface-border/50 pt-2">
+                      <span>Ahorro con Membresía Unlock:</span>
+                      <span>+ {(feeDetails.subtotal * 0.005).toFixed(2)} USDC</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-white font-bold text-sm border-t border-surface-border pt-2.5">
+                    <span>Total a congelar en Escrow:</span>
+                    <span className="text-brand-300 font-black">{feeDetails.total.toFixed(2)} USDC</span>
+                  </div>
+                </div>
+
                 <Button
                   onClick={handleCreateOrder}
                   isLoading={isSubmitting || isApproving}
@@ -600,7 +634,7 @@ export default function HomePage() {
                     ? "Aprobando USDC en tu wallet..."
                     : isSubmitting
                     ? "Bloqueando fondos en contrato..."
-                    : `Bloquear y Custodiar ${amountUSDC} USDC`}
+                    : `Bloquear y Custodiar ${feeDetails.total.toFixed(2)} USDC`}
                 </Button>
               </div>
             </div>

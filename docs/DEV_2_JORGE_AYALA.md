@@ -51,7 +51,7 @@
 | **[TK-JORGE-02](#tk-jorge-02-hooks-transaccionales-de-altipayescrow)** | Hooks Transaccionales de `AltiPayEscrow` | **P0 (Bloqueante)** | 2.5 h | 🟢 **Done (100%)** | `hooks/useAltiPayEscrow.ts`, `contracts/index.ts` |
 | **[TK-JORGE-03](#tk-jorge-03-hook-de-aprobación-balance-y-faucet-mockusdc)** | Hook de Aprobación, Balance y Faucet `MockUSDC` | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (100%)** | `hooks/useUSDC.ts` |
 | **[TK-JORGE-04](#tk-jorge-04-servicio-centralizado-de-transacciones-y-toasts)** | Servicio Centralizado de Transacciones & Toasts | **P1 (Core UX)** | 1.5 h | 🟢 **Done (100%)** | `services/transactionHandler.ts` |
-| **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟢 **Done (95%)** | `hooks/useUnlockVIP.ts`, `components/bounties/UnlockVIPBadge.tsx` |
+| **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟢 **Done (100%)** | `hooks/useUnlockVIP.ts`, `components/bounties/UnlockVIPBadge.tsx` |
 | **[TK-JORGE-06](#tk-jorge-06-bounty-pollar-mainnet-usdc-checkout-engine)** | [Bounty] Pollar Mainnet USDC Checkout Engine | **P1 (Bounty)** | 2.0 h | 🟡 **In Progress (80%)** | `components/bounties/PollarCheckoutButton.tsx` |
 | **[TK-JORGE-07](#tk-jorge-07-integración-y-cableado-con-vistas-de-dev-3-y-dev-4)** | Integración y Cableado con Vistas de DEV 3 y DEV 4 | **P1 (Handoff)** | 3.0 h | 🟡 **In Progress (60%)** | `app/page.tsx`, `components/ui/button.tsx` |
 | **[TK-JORGE-08](#tk-jorge-08-pruebas-transaccionales-e2e-en-testnet)** | Pruebas Transaccionales E2E en Testnet (HSK / Fuji) | **P2 (QA)** | 2.0 h | 🔴 **Pending** | Consola dApp / Explorador de bloques |
@@ -171,9 +171,9 @@ Permitir a los comerciantes bolivianos obtener **0% de comisión de protocolo** 
 #### 📋 Criterios de Aceptación (DoD):
 * [x] Hook `useUnlockVIP()` consulta la función `vipLock()` del contrato Escrow.
 * [x] Consulta `getHasValidKey(userAddress)` sobre la dirección del Lock de Unlock.
-* [x] Retorna `{ isVIP, feePercent, feeBasisPoints, statusText, refetchVIPStatus }`.
-* [ ] **Pendiente:** Crear `UnlockVIPBadge.tsx` que muestre una insignia dorada: *"🌟 Miembro VIP AltiPay (Comisión 0%)"* o botón para adquirir membresía.
-* [ ] **Pendiente:** Conectar el valor `feePercent` al formulario de DEV 3 en `/create`.
+* [x] Retorna `{ isVIP, feePercent, feeBasisPoints, statusText, calculateFee, refetchVIPStatus }`.
+* [x] **Completado:** Creado `UnlockVIPBadge.tsx` con soporte de insignia VIP, toggle interactivo para demos y enlace a Unlock Protocol.
+* [x] **Completado:** Conectado el valor `feePercent` y el desglose de ahorro en tiempo real al formulario de creación de orden.
 
 ---
 
