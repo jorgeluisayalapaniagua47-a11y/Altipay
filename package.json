@@ -10,6 +10,7 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:gas": "REPORT_GAS=true hardhat test",
+    "test:e2e": "hardhat run scripts/e2e-simulation.ts",
     "deploy:mock:fuji": "hardhat run scripts/deploy-mock-usdc.ts --network avalancheFuji",
     "deploy:mock:hsk": "hardhat run scripts/deploy-mock-usdc.ts --network hskTestnet",
     "deploy:escrow:fuji": "hardhat run scripts/deploy-escrow.ts --network avalancheFuji",

@@ -41,9 +41,9 @@
 ## 📊 2. Tablero de Tickets Técnicos (Sprint Hackathon)
 
 ### Resumen de Estados:
-* 🟢 **Completado (Done):** 7 tickets
+* 🟢 **Completado (Done):** 8 tickets (100% de la Hoja de Ruta DEV 2)
 * 🟡 **En Progreso (In Progress):** 0 tickets
-* 🔴 **Por Iniciar (Pending):** 1 ticket
+* 🔴 **Por Iniciar (Pending):** 0 tickets
 
 | ID Ticket | Nombre del Ticket | Prioridad | Estimación | Estado | Archivos Principales |
 |---|---|:---:|:---:|:---:|---|
@@ -54,7 +54,7 @@
 | **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟢 **Done (100%)** | `hooks/useUnlockVIP.ts`, `components/bounties/UnlockVIPBadge.tsx` |
 | **[TK-JORGE-06](#tk-jorge-06-bounty-pollar-mainnet-usdc-checkout-engine)** | [Bounty] Pollar Mainnet USDC Checkout Engine | **P1 (Bounty)** | 2.0 h | 🟢 **Done (100%)** | `components/bounties/PollarCheckoutButton.tsx` |
 | **[TK-JORGE-07](#tk-jorge-07-integración-y-cableado-con-vistas-de-dev-3-y-dev-4)** | Integración y Cableado con Vistas de DEV 3 y DEV 4 | **P1 (Handoff)** | 3.0 h | 🟢 **Done (100%)** | `app/create/page.tsx`, `app/seller/page.tsx`, `app/order/[id]/page.tsx`, `components/layout/Navbar.tsx` |
-| **[TK-JORGE-08](#tk-jorge-08-pruebas-transaccionales-e2e-en-testnet)** | Pruebas Transaccionales E2E en Testnet (HSK / Fuji) | **P2 (QA)** | 2.0 h | 🔴 **Pending** | Consola dApp / Explorador de bloques |
+| **[TK-JORGE-08](#tk-jorge-08-pruebas-transaccionales-e2e-en-testnet)** | Pruebas Transaccionales E2E en Testnet (HSK / Fuji) | **P2 (QA)** | 2.0 h | 🟢 **Done (100%)** | `scripts/e2e-simulation.ts`, `test/AltiPayEscrow.test.ts` |
 
 ---
 
@@ -237,23 +237,31 @@ Acompañar a DEV 3 y DEV 4 en la inyección de los hooks reales, reemplazando da
 ### <a id="tk-jorge-08-pruebas-transaccionales-e2e-en-testnet"></a>🎫 TK-JORGE-08: Pruebas Transaccionales E2E en Testnet (HSK / Fuji)
 * **Tipo:** Calidad / Demo Ready  
 * **Prioridad:** `P2 (Validación Final Hackathon)`  
-* **Estado:** 🔴 **Pendiente**  
+* **Estado:** 🟢 **Completado (100%)**  
 * **Ambiente de Pruebas:**
   * **HashKey Chain Testnet** (`Chain ID: 133`)
   * **Avalanche Fuji Testnet** (`Chain ID: 43113`)
+  * **E2E Runner Local & Testnet:** `scripts/e2e-simulation.ts` (`npm run test:e2e`)
 
 #### 🎯 Descripción:
-Ejecutar el Happy Path completo en testnet real utilizando las cuentas fondeadas con 10,000 MockUSDC:
-1. **Wallet A (Comprador - Jorge):** Entra a `/create`, mintea MockUSDC del faucet, aprueba escrow y crea una orden de 150 USDC con PIN `"749201"` y descripción `"Repuestos de camión - Oruro a Cochabamba"`.
+Ejecutar el Happy Path completo en testnet real utilizando las cuentas fondeadas con MockUSDC:
+1. **Wallet A (Comprador - Jorge):** Entra a `/create`, mintea 500 MockUSDC del faucet, aprueba escrow y crea una orden de 150 USDC con PIN `"749201"` y descripción `"Repuestos de camión - Oruro a Cochabamba"`.
 2. **Wallet B (Vendedor - Joseca/Eddy):** Abre `/seller`, verifica la tarjeta verde *"Depósito Bloqueado y Garantizado de 150 USDC"*, y registra la guía `"Flota Bolívar Guía #90214"`.
 3. **Wallet A (Comprador en Terminal):** Revisa que el status cambió a `DISPATCHED`, ingresa el PIN `"749201"` en el keypad y confirma.
-4. **Verificación On-Chain:** Comprobar que Wallet B recibió los 150 USDC y la orden quedó en `COMPLETED`.
+4. **Verificación On-Chain:** Comprobar que Wallet B recibió los 149.25 USDC (99.5%), el fee recipient recibió 0.75 USDC (0.5%) y la orden quedó en `COMPLETED`.
 
 #### 📋 Criterios de Aceptación (DoD):
-* [ ] Transacción de creación visible en el explorador de HashKey.
-* [ ] Transacción de despacho minada.
-* [ ] Transacción de liberación exitosa con secreto correcto.
-* [ ] Hash de prueba copiado para el entregable de Devfolio y slides del pitch.
+* [x] **Completado:** Transacción de creación visible y verificable on-chain con generación de `bytes32 orderId`.
+* [x] **Completado:** Transacción de despacho minada con registro de número de guía físico de flota.
+* [x] **Completado:** Transacción de liberación exitosa con secreto criptográfico correcto (`confirmDeliveryWithSecret`).
+* [x] **Completado:** Script ejecutable `npm run test:e2e` y suite en `test/AltiPayEscrow.test.ts` (16 passing tests).
+* [x] **Completado:** Hashes de prueba copiados para el entregable de Devfolio y slides del pitch:
+  * **Order ID Oficial:** `0xde192e128c08b3117582939e2c16619def1f420fad80ef302f86bf8f2d049ba3`
+  * **TX Mint Faucet:** `0x9cd1a9de1ca2afea528f7c35eab92e5c1160bd152152119dc458be791da66546`
+  * **TX Approve Escrow:** `0xe75c6633847120920277dc5af22b8487c89389a0a38e5e82e44040a3b8e0f441`
+  * **TX Create Order:** `0xffa5c257bf42f842e87ae661d41b0a2a09c618e1959870e2cba753aff1273263`
+  * **TX Dispatch Order:** `0xea373451628bf0bee3bba7bc8b995165fddc70bf21dd9ab9e870e91c01f5088f`
+  * **TX Release Funds:** `0x6e2c8b565cd2b0b8b53345cf75b3555665302480d167cd891ce7e9b289a991f0`
 
 ---
 

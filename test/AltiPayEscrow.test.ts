@@ -320,4 +320,75 @@ describe("AltiPayEscrow Protocol — Suite de Pruebas Unitarias", function () {
       ).to.be.revertedWith("Cannot cancel after dispatch");
     });
   });
+
+  describe("7. Flujo E2E Happy Path Completo (TK-JORGE-08)", function () {
+    it("Debe ejecutar el ciclo de vida completo: Faucet -> Aprobación -> Custodia -> Despacho -> Liberación con PIN", async function () {
+      // 1. Faucet
+      const faucetAmount = ethers.parseUnits("500", DECIMALS);
+      await usdc.faucet(buyer.address, faucetAmount);
+
+      // 2. Aprobación
+      const orderAmount = ethers.parseUnits("150", DECIMALS);
+      await usdc.connect(buyer).approve(await escrow.getAddress(), orderAmount);
+
+      // 3. Crear Custodia
+      const PIN = "749201";
+      const pinBytes32 = ethers.encodeBytes32String(PIN);
+      const pinHash = ethers.keccak256(ethers.solidityPacked(["bytes32"], [pinBytes32]));
+      const deadline = (await time.latest()) + 48 * 3600;
+
+      const tx = await escrow.connect(buyer).createOrder(
+        seller.address,
+        await usdc.getAddress(),
+        orderAmount,
+        pinHash,
+        deadline,
+        "Repuestos de camión - Oruro a Cochabamba"
+      );
+      const receipt = await tx.wait();
+
+      let e2eOrderId = "";
+      for (const log of receipt?.logs || []) {
+        try {
+          const parsed = escrow.interface.parseLog(log);
+          if (parsed?.name === "OrderCreated") {
+            e2eOrderId = parsed.args[0];
+            break;
+          }
+        } catch {}
+      }
+      expect(e2eOrderId).to.not.equal("");
+
+      // Estado FUNDED (1)
+      let order = await escrow.getOrder(e2eOrderId);
+      expect(order.status).to.equal(1n);
+
+      // 4. Vendedor confirma despacho
+      await escrow.connect(seller).confirmDispatch(e2eOrderId, "Flota Bolívar Guía #90214");
+      order = await escrow.getOrder(e2eOrderId);
+      expect(order.status).to.equal(2n);
+      expect(order.trackingInfo).to.equal("Flota Bolívar Guía #90214");
+
+      // 5. Comprador libera con PIN
+      const sellerBalBefore = await usdc.balanceOf(seller.address);
+      const feeBalBefore = await usdc.balanceOf(feeRecipient.address);
+
+      await escrow.connect(buyer).confirmDeliveryWithSecret(e2eOrderId, pinBytes32);
+
+      // Estado COMPLETED (3)
+      order = await escrow.getOrder(e2eOrderId);
+      expect(order.status).to.equal(3n);
+      expect(order.completedAt).to.be.greaterThan(0n);
+
+      // Verificación de saldos
+      const sellerReceived = (await usdc.balanceOf(seller.address)) - sellerBalBefore;
+      const feeReceived = (await usdc.balanceOf(feeRecipient.address)) - feeBalBefore;
+
+      const expectedFee = (orderAmount * 50n) / 10000n; // 0.5%
+      const expectedSellerAmount = orderAmount - expectedFee;
+
+      expect(sellerReceived).to.equal(expectedSellerAmount);
+      expect(feeReceived).to.equal(expectedFee);
+    });
+  });
 });
