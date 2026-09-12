@@ -38,6 +38,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       avalancheFuji: SNOWTRACE_API_KEY,
+      hskTestnet: "empty",
     },
     customChains: [
       {
@@ -57,6 +58,9 @@ const config: HardhatUserConfig = {
         },
       },
     ],
+  },
+  sourcify: {
+    enabled: true,
   },
   paths: {
     sources: "./contracts",

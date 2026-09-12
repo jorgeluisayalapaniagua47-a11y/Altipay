@@ -11,6 +11,8 @@
     "deploy:mock:hsk": "hardhat run scripts/deploy-mock-usdc.ts --network hskTestnet",
     "deploy:escrow:fuji": "hardhat run scripts/deploy-escrow.ts --network avalancheFuji",
     "deploy:escrow:hsk": "hardhat run scripts/deploy-escrow.ts --network hskTestnet",
+    "distribute:mock:hsk": "hardhat run scripts/distribute-mock-usdc.ts --network hskTestnet",
+    "distribute:mock:fuji": "hardhat run scripts/distribute-mock-usdc.ts --network avalancheFuji",
     "export:artifacts": "ts-node scripts/export-artifacts.ts"
   },
   "keywords": [

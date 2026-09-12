@@ -28,7 +28,7 @@
 
 | Desarrollador | Rol Técnico Principal | % Completado | Estado Actual | Tareas Clave Próximas |
 |---|---|:---:|:---:|---|
-| **Luis Sandoval**<br/>*(DEV 1)* | **Smart Contracts & Protocol Core** | **94%** | 🟢 **HSK Desplegado en Vivo** | Reclamar AVAX en faucet.avax.network y correr deploy de Fuji. |
+| **Luis Sandoval**<br/>*(DEV 1)* | **Smart Contracts & Protocol Core** | **96%** | 🟢 **HSK y Fondos Listos** | Desplegar Fuji cuando llegue AVAX de Discord. |
 | **Jorge Ayala**<br/>*(DEV 2)* | **Web3 Core & Patrocinadores SDK** | **8%** | 🟡 **Desbloqueado para Iniciar** | Montar hooks Wagmi con `deployedContracts.ts` e integrar checkout de Pollar. |
 | **Eddy Galvan**<br/>*(DEV 3)* | **UI/UX, Design System & Buyer Flow** | **5%** | 🟡 **Desbloqueado para Iniciar** | Maquetar Landing Page y vista de creación de orden con generador de PIN. |
 | **Joseca**<br/>*(DEV 4)* | **Seller Flow, Off-Chain & Pitch/Video** | **5%** | 🟡 **Desbloqueado para Iniciar** | Maquetar Dashboard Vendedor y preparar guión del video Bounty Vaquita. |
@@ -71,13 +71,12 @@ Para evitar números arbitrarios, el porcentaje de avance global se calcula pond
 * [x] Desarrollo de `contracts/MockUSDC.sol` con 6 decimales y función pública `faucet(...)`.
 * [x] Interfaces `IAltiPayEscrow.sol` e `IUnlockLock.sol`.
 * [x] Suite de pruebas automatizadas con **15 tests pasando en 670ms** (`test/AltiPayEscrow.test.ts`).
-* [x] Script de exportación automática (`scripts/export-artifacts.ts`) ejecutado: generó `frontend/contracts/deployedContracts.ts` para Jorge Ayala.
+* [x] Desplegar `MockUSDC` (`0xAe9F9d28E0Ba5Ea67dE0F3C82dc7e7215b6c855C`) y `AltiPayEscrow` (`0xC7d4d9a5708185761DDb65e014a0691C1f99679A`) en **HSK Chain Testnet en vivo**.
+* [x] Distribuir fondos on-chain: 10,000 MockUSDC acreditados exitosamente a las wallets de Jorge, Eddy y Joseca.
 
-#### ⏳ Pendiente (12% restante):
-* [ ] Desplegar `MockUSDC` y `AltiPayEscrow` en la testnet pública de **Avalanche Fuji** usando una clave con faucet AVAX.
-* [ ] Desplegar `MockUSDC` y `AltiPayEscrow` en la testnet pública de **HSK Chain** usando una clave con faucet HSK.
-* [ ] Verificar el código fuente en Snowtrace (Avalanche) y en el explorador oficial de HSK.
-* [ ] Distribuir tokens `MockUSDC` a las wallets de Jorge, Eddy y Joseca.
+#### ⏳ Pendiente (4% restante):
+* [ ] Desplegar `MockUSDC` y `AltiPayEscrow` en la testnet pública de **Avalanche Fuji** en cuanto el mentor en Discord envíe 0.5 AVAX de prueba.
+* [ ] Verificar el código fuente en Snowtrace (Avalanche).
 
 ---
 
