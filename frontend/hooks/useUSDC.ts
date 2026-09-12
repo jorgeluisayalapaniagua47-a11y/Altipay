@@ -1,14 +1,16 @@
 "use client";
 
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, usePublicClient } from "wagmi";
 import { parseUnits, formatUnits } from "viem";
 import { ERC20_ABI, getUSDCContractAddress, getEscrowContractConfig } from "@/contracts";
 
 /**
  * Hook para interactuar con el token USDC (balance, allowance, approve y faucet)
+ * Incluye confirmación en bloque para actualización precisa de balances
  */
 export function useUSDC() {
   const { address, chainId } = useAccount();
+  const publicClient = usePublicClient();
   const usdcAddress = getUSDCContractAddress(chainId);
   const escrowConfig = getEscrowContractConfig(chainId);
 
@@ -59,6 +61,11 @@ export function useUSDC() {
       functionName: "approve",
       args: [escrowConfig.address, amountWei],
     });
+
+    if (publicClient) {
+      await publicClient.waitForTransactionReceipt({ hash: txHash });
+    }
+
     await refetchAllowance();
     return txHash;
   };
@@ -76,6 +83,11 @@ export function useUSDC() {
       functionName: "faucet",
       args: [address, amountWei],
     });
+
+    if (publicClient) {
+      await publicClient.waitForTransactionReceipt({ hash: txHash });
+    }
+
     await refetchBalance();
     return txHash;
   };

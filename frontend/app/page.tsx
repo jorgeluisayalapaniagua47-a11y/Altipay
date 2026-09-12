@@ -146,8 +146,11 @@ export default function HomePage() {
           deadlineHours: 48,
         });
 
-        if (result.txHash) {
+        if (result.orderId) {
+          setActiveOrderId(result.orderId);
+        } else if (result.txHash) {
           setActiveOrderId(result.txHash);
+        }
           // Agregar a la lista de órdenes visual
           const newEscrow: DemoEscrowItem = {
             id: `ALT-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -162,7 +165,6 @@ export default function HomePage() {
             initials: "BO",
           };
           setEscrows([newEscrow, ...escrows]);
-        }
 
         return result;
       },

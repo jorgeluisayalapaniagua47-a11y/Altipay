@@ -1,7 +1,8 @@
 "use client";
 
-import { useAccount, useWriteContract, useReadContract } from "wagmi";
-import { keccak256, encodePacked, stringToHex, parseUnits } from "viem";
+import { useState } from "react";
+import { useAccount, useWriteContract, useReadContract, usePublicClient } from "wagmi";
+import { keccak256, encodePacked, stringToHex, parseUnits, parseEventLogs, TransactionReceipt } from "viem";
 import { getEscrowContractConfig, getUSDCContractAddress } from "@/contracts";
 
 export enum OrderStatus {
@@ -28,12 +29,18 @@ export interface OrderDetails {
 }
 
 /**
- * Hook para la gestión de operaciones del Smart Contract AltiPayEscrow
+ * Hook para la gestión integral y transaccional del Smart Contract AltiPayEscrow
+ * Incluye confirmación en bloque (waitForReceipt), extracción de orderId y control de minado
  */
 export function useAltiPayEscrow() {
   const { chainId, address } = useAccount();
+  const publicClient = usePublicClient();
   const escrowConfig = getEscrowContractConfig(chainId);
   const defaultToken = getUSDCContractAddress(chainId);
+
+  const [isWaitingTx, setIsWaitingTx] = useState<boolean>(false);
+  const [lastTxHash, setLastTxHash] = useState<`0x${string}` | null>(null);
+  const [lastReceipt, setLastReceipt] = useState<TransactionReceipt | null>(null);
 
   const {
     writeContractAsync,
@@ -42,8 +49,23 @@ export function useAltiPayEscrow() {
   } = useWriteContract();
 
   /**
+   * Espera la confirmación en bloque de una transacción y retorna el recibo
+   */
+  const waitForReceipt = async (hash: `0x${string}`): Promise<TransactionReceipt | null> => {
+    if (!publicClient) return null;
+    setIsWaitingTx(true);
+    try {
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      setLastReceipt(receipt);
+      return receipt;
+    } finally {
+      setIsWaitingTx(false);
+    }
+  };
+
+  /**
    * 1. CREAR ORDEN (Comprador)
-   * Genera el secretHash criptográfico a partir del PIN/código secreto y envía la TX
+   * Genera secretHash, envía la TX, espera el bloque y extrae el orderId oficial del evento on-chain
    */
   const createOrder = async ({
     seller,
@@ -52,20 +74,27 @@ export function useAltiPayEscrow() {
     deadlineHours = 48,
     description,
     tokenAddress,
+    waitConfirm = true,
   }: {
     seller: `0x${string}`;
-    amountUSDC: string; // ej. "150"
-    secretPin: string; // ej. "849201" o "ALTI-8492"
+    amountUSDC: string;
+    secretPin: string;
     deadlineHours?: number;
     description: string;
     tokenAddress?: `0x${string}`;
-  }) => {
-    // Cálculo seguro del hash criptográfico keccak256
-    // Para coincidir con abi.encodePacked(bytes32(_secret)) en Solidity
+    waitConfirm?: boolean;
+  }): Promise<{
+    txHash: `0x${string}`;
+    orderId?: `0x${string}`;
+    receipt?: TransactionReceipt | null;
+    secretPin: string;
+    secretHash: `0x${string}`;
+  }> => {
+    // Cálculo criptográfico idéntico a keccak256(abi.encodePacked(bytes32(_secret)))
     const secretBytes32 = stringToHex(secretPin, { size: 32 });
     const secretHash = keccak256(encodePacked(["bytes32"], [secretBytes32]));
 
-    const amountWei = parseUnits(amountUSDC, 6); // USDC maneja 6 decimales
+    const amountWei = parseUnits(amountUSDC, 6);
     const deadlineTimestamp = BigInt(Math.floor(Date.now() / 1000) + deadlineHours * 3600);
     const token = tokenAddress || defaultToken;
 
@@ -76,20 +105,53 @@ export function useAltiPayEscrow() {
       args: [seller, token, amountWei, secretHash, deadlineTimestamp, description],
     });
 
-    return { txHash, secretPin, secretHash };
+    setLastTxHash(txHash);
+
+    let receipt: TransactionReceipt | null = null;
+    let orderId: `0x${string}` | undefined;
+
+    if (waitConfirm && publicClient) {
+      receipt = await waitForReceipt(txHash);
+
+      if (receipt) {
+        try {
+          const logs = parseEventLogs({
+            abi: escrowConfig.abi,
+            logs: receipt.logs,
+            eventName: "OrderCreated",
+          });
+
+          if (logs.length > 0) {
+            const firstLog = logs[0] as any;
+            if (firstLog?.args?.orderId) {
+              orderId = firstLog.args.orderId as `0x${string}`;
+            }
+          }
+        } catch (e) {
+          console.warn("No se pudo extraer orderId del log del recibo:", e);
+        }
+      }
+    }
+
+    return { txHash, orderId, receipt, secretPin, secretHash };
   };
 
   /**
    * 2. CONFIRMAR DESPACHO (Vendedor)
-   * Registra el número de guía física de la flota/bus en terminal
+   * Registra el número de guía física de la flota/bus en terminal y espera confirmación
    */
   const confirmDispatch = async ({
     orderId,
     trackingInfo,
+    waitConfirm = true,
   }: {
     orderId: `0x${string}`;
-    trackingInfo: string; // ej. "Flota Bolívar Guía #40921"
-  }) => {
+    trackingInfo: string;
+    waitConfirm?: boolean;
+  }): Promise<{
+    txHash: `0x${string}`;
+    receipt?: TransactionReceipt | null;
+  }> => {
     const txHash = await writeContractAsync({
       address: escrowConfig.address,
       abi: escrowConfig.abi,
@@ -97,7 +159,14 @@ export function useAltiPayEscrow() {
       args: [orderId, trackingInfo],
     });
 
-    return { txHash };
+    setLastTxHash(txHash);
+
+    let receipt: TransactionReceipt | null = null;
+    if (waitConfirm && publicClient) {
+      receipt = await waitForReceipt(txHash);
+    }
+
+    return { txHash, receipt };
   };
 
   /**
@@ -107,10 +176,15 @@ export function useAltiPayEscrow() {
   const confirmDeliveryWithSecret = async ({
     orderId,
     secretPin,
+    waitConfirm = true,
   }: {
     orderId: `0x${string}`;
     secretPin: string;
-  }) => {
+    waitConfirm?: boolean;
+  }): Promise<{
+    txHash: `0x${string}`;
+    receipt?: TransactionReceipt | null;
+  }> => {
     const secretBytes32 = stringToHex(secretPin, { size: 32 });
 
     const txHash = await writeContractAsync({
@@ -120,14 +194,27 @@ export function useAltiPayEscrow() {
       args: [orderId, secretBytes32],
     });
 
-    return { txHash };
+    setLastTxHash(txHash);
+
+    let receipt: TransactionReceipt | null = null;
+    if (waitConfirm && publicClient) {
+      receipt = await waitForReceipt(txHash);
+    }
+
+    return { txHash, receipt };
   };
 
   /**
    * 4. RECLAMAR REEMBOLSO (Comprador)
    * Si expira el plazo límite sin entrega, recupera el 100% de los fondos
    */
-  const claimRefund = async (orderId: `0x${string}`) => {
+  const claimRefund = async (
+    orderId: `0x${string}`,
+    waitConfirm = true
+  ): Promise<{
+    txHash: `0x${string}`;
+    receipt?: TransactionReceipt | null;
+  }> => {
     const txHash = await writeContractAsync({
       address: escrowConfig.address,
       abi: escrowConfig.abi,
@@ -135,14 +222,27 @@ export function useAltiPayEscrow() {
       args: [orderId],
     });
 
-    return { txHash };
+    setLastTxHash(txHash);
+
+    let receipt: TransactionReceipt | null = null;
+    if (waitConfirm && publicClient) {
+      receipt = await waitForReceipt(txHash);
+    }
+
+    return { txHash, receipt };
   };
 
   /**
    * 5. CANCELAR ORDEN (Comprador)
    * Cancela la orden antes de que el vendedor la despache
    */
-  const cancelOrder = async (orderId: `0x${string}`) => {
+  const cancelOrder = async (
+    orderId: `0x${string}`,
+    waitConfirm = true
+  ): Promise<{
+    txHash: `0x${string}`;
+    receipt?: TransactionReceipt | null;
+  }> => {
     const txHash = await writeContractAsync({
       address: escrowConfig.address,
       abi: escrowConfig.abi,
@@ -150,7 +250,14 @@ export function useAltiPayEscrow() {
       args: [orderId],
     });
 
-    return { txHash };
+    setLastTxHash(txHash);
+
+    let receipt: TransactionReceipt | null = null;
+    if (waitConfirm && publicClient) {
+      receipt = await waitForReceipt(txHash);
+    }
+
+    return { txHash, receipt };
   };
 
   return {
@@ -160,7 +267,12 @@ export function useAltiPayEscrow() {
     confirmDeliveryWithSecret,
     claimRefund,
     cancelOrder,
+    waitForReceipt,
     isSubmitting,
+    isWaitingTx,
+    isMining: isWaitingTx,
+    lastTxHash,
+    lastReceipt,
     writeError,
   };
 }
@@ -178,7 +290,7 @@ export function useGetOrder(orderId?: `0x${string}`) {
     functionName: "getOrder",
     args: orderId ? [orderId] : undefined,
     query: {
-      enabled: Boolean(orderId),
+      enabled: Boolean(orderId && orderId !== "0x0000000000000000000000000000000000000000"),
     },
   });
 }

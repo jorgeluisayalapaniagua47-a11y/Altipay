@@ -48,7 +48,7 @@
 | ID Ticket | Nombre del Ticket | Prioridad | Estimación | Estado | Archivos Principales |
 |---|---|:---:|:---:|:---:|---|
 | **[TK-JORGE-01](#tk-jorge-01-configuración-multichain-wagmi-v2--rainbowkit)** | Configuración Multichain Wagmi v2 & RainbowKit | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (100%)** | `config/wagmi.ts`, `components/web3/*` |
-| **[TK-JORGE-02](#tk-jorge-02-hooks-transaccionales-de-altipayescrow)** | Hooks Transaccionales de `AltiPayEscrow` | **P0 (Bloqueante)** | 2.5 h | 🟢 **Done (95%)** | `hooks/useAltiPayEscrow.ts`, `contracts/index.ts` |
+| **[TK-JORGE-02](#tk-jorge-02-hooks-transaccionales-de-altipayescrow)** | Hooks Transaccionales de `AltiPayEscrow` | **P0 (Bloqueante)** | 2.5 h | 🟢 **Done (100%)** | `hooks/useAltiPayEscrow.ts`, `contracts/index.ts` |
 | **[TK-JORGE-03](#tk-jorge-03-hook-de-aprobación-balance-y-faucet-mockusdc)** | Hook de Aprobación, Balance y Faucet `MockUSDC` | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (100%)** | `hooks/useUSDC.ts` |
 | **[TK-JORGE-04](#tk-jorge-04-servicio-centralizado-de-transacciones-y-toasts)** | Servicio Centralizado de Transacciones & Toasts | **P1 (Core UX)** | 1.5 h | 🟢 **Done (100%)** | `services/transactionHandler.ts` |
 | **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟢 **Done (95%)** | `hooks/useUnlockVIP.ts`, `components/bounties/UnlockVIPBadge.tsx` |
@@ -107,7 +107,8 @@ Exponer todas las operaciones del contrato `AltiPayEscrow` de forma limpia y tip
 * [x] Mapeo de `OrderStatus` tipado (`NONE`, `FUNDED`, `DISPATCHED`, `COMPLETED`, `REFUNDED`, `CANCELLED`).
 * [x] Hash `keccak256` idéntico a `abi.encodePacked(bytes32(_secret))` del contrato Solidity.
 * [x] Manejo de `query.enabled` en hooks de lectura para evitar consultas con argumentos nulos.
-* [ ] **Pendiente:** Añadir retorno de `isWaitingTx` o `waitForTransactionReceipt` para saber cuándo la transacción ya fue minada en bloque.
+* [x] **Completado:** Retorno de `isWaitingTx` / `isMining` y confirmación automática con `waitForTransactionReceipt`.
+* [x] **Completado:** Extracción automática del `orderId` oficial del evento `OrderCreated` en el recibo de la transacción.
 
 ---
 
