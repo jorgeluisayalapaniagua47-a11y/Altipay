@@ -58,8 +58,8 @@ AltiPay es un protocolo **backend-less** por diseño. La lógica de negocio, per
 │  │                  TOOLCHAIN DE DESARROLLO                          │  │
 │  │                                                                    │  │
 │  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │  │
-│  │  │ Hardhat  │  │ Solidity │  │ OpenZep  │  │ Ethers.js v6     │  │  │
-│  │  │ v2.x     │  │ ^0.8.20  │  │ Contracts│  │ (deployment)     │  │  │
+│  │  │ Foundry/ │  │ Solidity │  │ OpenZep  │  │ Unlock Protocol  │  │  │
+│  │  │ Hardhat  │  │ ^0.8.20  │  │ Contracts│  │ (VIP Lock ERC721)│  │  │
 │  │  └──────────┘  └──────────┘  └──────────┘  └──────────────────┘  │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -69,7 +69,7 @@ AltiPay es un protocolo **backend-less** por diseño. La lógica de negocio, per
 
 ## 2. Contrato Principal: AltiPayEscrow
 
-### 2.1 Especificación de Interfaz
+### 2.1 Especificación de Interfaz e Integración Unlock Protocol
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -79,8 +79,18 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+// Interfaz para validación de membresía VIP con Unlock Protocol
+interface IUnlockLock {
+    function getHasValidKey(address _user) external view returns (bool);
+}
+
 contract AltiPayEscrow is ReentrancyGuard {
     using SafeERC20 for IERC20;
+
+    // Dirección del contrato Lock de Unlock Protocol ("AltiPay VIP Key")
+    IUnlockLock public vipLock;
+    address public feeRecipient;
+    uint256 public constant BASE_FEE_BPS = 50; // 0.5% (50 basis points)
 
     // ──── Enums ────
     enum OrderStatus {

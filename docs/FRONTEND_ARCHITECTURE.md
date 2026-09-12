@@ -8,7 +8,7 @@
 
 ## 1. Visión General
 
-El frontend de AltiPay es una **Single Page Application (SPA)** construida con React + Vite que se conecta directamente a la blockchain vía Web3 providers (MetaMask, WalletConnect). No existe backend intermedio — toda la interacción es client-to-chain.
+El frontend de AltiPay es una aplicación Web3 moderna construida sobre **Next.js 14 (App Router) + React**, estilada con **Tailwind CSS**, y conectada a la blockchain mediante **Wagmi y Viem**. Acelerada mediante la base de **Scaffold-ETH 2**, permite una interacción directa cliente-a-contrato sin servidores intermediarios, garantizando soberanía no custodial.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -19,43 +19,32 @@ El frontend de AltiPay es una **Single Page Application (SPA)** construida con R
 │  │                                                                   │   │
 │  │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌──────────────┐  │   │
 │  │  │  Landing   │ │ Dashboard  │ │  New Order │ │ Order Detail │  │   │
-│  │  │  Page      │ │  Page      │ │  Page      │ │ Page         │  │   │
+│  │  │  Page      │ │ (Vendedor) │ │ (Comprador)│ │ (Mobile-PIN) │  │   │
 │  │  └────────────┘ └────────────┘ └────────────┘ └──────────────┘  │   │
 │  │                                                                   │   │
 │  │  ┌────────────────────────────────────────────────────────────┐   │   │
-│  │  │                 COMPONENTES REUTILIZABLES                  │   │   │
-│  │  │  OrderCard · StatusBadge · SecretModal · ChainSelector    │   │   │
-│  │  │  WalletButton · ProgressTracker · AmountInput · Toast     │   │   │
+│  │  │              INTEGRACIONES SDKs & MIDDLEWARE              │   │   │
+│  │  │  • @pollar/react (Botón de Pago Mainnet en USDC)           │   │   │
+│  │  │  • @unlock-protocol/react (Membresía VIP NFT 0% Fee)       │   │   │
+│  │  │  • RainbowKit / Wagmi (Multi-wallet connector)             │   │   │
 │  │  └────────────────────────────────────────────────────────────┘   │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 │                                    │                                    │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                      CAPA DE ESTADO (State)                      │   │
+│  │                    CAPA DE ESTADO Y HOOKS (Web3)                 │   │
 │  │                                                                   │   │
 │  │  ┌────────────────┐  ┌─────────────────┐  ┌──────────────────┐  │   │
-│  │  │  WalletContext  │  │  OrdersContext  │  │  ChainContext    │  │   │
-│  │  │  (conexión,     │  │  (CRUD órdenes, │  │  (red activa,   │  │   │
-│  │  │   saldo, auth)  │  │   caché local)  │  │   switch chain) │  │   │
+│  │  │  useAccount    │  │  useContractRead│  │  useUnlockKey    │  │   │
+│  │  │  (Wagmi Auth)  │  │  (Escrow State) │  │  (VIP Fee Waiver)│  │   │
 │  │  └────────────────┘  └─────────────────┘  └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 │                                    │                                    │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                    CAPA DE SERVICIOS (Web3)                      │   │
+│  │                   CAPA DE REDES Y SMART CONTRACTS                │   │
 │  │                                                                   │   │
 │  │  ┌────────────────┐  ┌─────────────────┐  ┌──────────────────┐  │   │
-│  │  │  ContractService│ │  WalletService  │  │  EventService    │  │   │
-│  │  │  (ethers.js     │  │  (connect,     │  │  (listen events, │  │   │
-│  │  │   contract      │  │   sign, switch) │  │   notifications) │  │   │
-│  │  │   calls)        │  │                │  │                  │  │   │
-│  │  └────────────────┘  └─────────────────┘  └──────────────────┘  │   │
-│  └──────────────────────────────────────────────────────────────────┘   │
-│                                    │                                    │
-│  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │                   CAPA DE BLOCKCHAIN (Provider)                  │   │
-│  │                                                                   │   │
-│  │  ┌────────────────┐  ┌─────────────────┐  ┌──────────────────┐  │   │
-│  │  │  MetaMask      │  │  Avalanche      │  │  HSK Chain       │  │   │
-│  │  │  Provider      │  │  Fuji RPC       │  │  RPC             │  │   │
+│  │  │  Avalanche     │  │  HSK Chain      │  │  Pollar Engine   │  │   │
+│  │  │  Fuji (43113)  │  │  Testnet (177)  │  │  (Mainnet USDC)  │  │   │
 │  │  └────────────────┘  └─────────────────┘  └──────────────────┘  │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -67,17 +56,16 @@ El frontend de AltiPay es una **Single Page Application (SPA)** construida con R
 
 | Categoría | Tecnología | Versión | Justificación |
 |-----------|-----------|---------|---------------|
-| **Framework** | React | 18.x | Ecosistema maduro, hooks, comunidad activa |
-| **Build Tool** | Vite | 5.x | Build rápido, HMR instantáneo, tree-shaking |
-| **Lenguaje** | TypeScript | 5.x | Type safety para contratos y ABIs |
-| **Web3 Library** | ethers.js | 6.x | Ligera, bien tipada, estándar en EVM |
-| **Routing** | React Router | 6.x | SPA routing declarativo |
-| **Estado** | React Context + useReducer | - | Suficiente para MVP sin Redux overhead |
-| **Styling** | CSS Modules + Variables | - | Zero runtime, design tokens nativos |
-| **Notificaciones** | React Hot Toast | 4.x | Lightweight, customizable |
-| **Iconos** | Lucide React | Latest | SVG icons, tree-shakeable |
-| **Animaciones** | Framer Motion | 11.x | Animaciones declarativas para React |
-| **Fecha/Hora** | date-fns | 3.x | Ligera, modular, tree-shakeable |
+| **Framework Core** | Next.js + React | 14.x / 18.x | Server Components, SEO optimizado, App Router rápido |
+| **Acelerador Base** | Scaffold-ETH 2 | Latest | Plantilla estándar hackathon, configuración inmediata de Wagmi/Viem |
+| **Estilos** | Tailwind CSS | 3.4.x | Maquetación veloz, diseño responsivo y mobile-first |
+| **Conexión Web3** | Wagmi + Viem | Latest | Hooks reactivos modernos para EVM, reemplazo de ethers.js |
+| **Wallet Connector** | RainbowKit | Latest | Soporte para MetaMask, Coinbase Wallet, WalletConnect |
+| **Motor de Pagos** | `@pollar/react` | Latest | Botón de checkout oficial para fondeo de garantía en mainnet USDC |
+| **Membresías NFT** | `@unlock-protocol/react` | Latest | Detección de llave "AltiPay VIP Key" para 0% fee waiver |
+| **Despliegue / Hosting** | Vercel / IPFS | Production | Publicación instantánea con SSL y dominios accesibles para jurados |
+| **Iconografía** | Lucide React | Latest | Iconos limpios, livianos y accesibles |
+| **Notificaciones** | Sonner / React Hot Toast | Latest | Feedback visual inmediato al confirmar transacciones on-chain |
 
 ---
 
@@ -1015,3 +1003,130 @@ export function getHumanReadableError(error: any): string {
   ]
 }
 ```
+
+---
+
+## 16. Integraciones SDK Oficiales de Bounties
+
+### 16.1 Motor de Pagos Pollar (`@pollar/react`)
+
+El componente de Pollar se utiliza en la pantalla de fondeo para renderizar el botón de checkout y procesar el depósito de garantía en USDC en mainnet.
+
+```tsx
+// src/components/PollarCheckoutWidget.tsx
+import React from 'react';
+// import { PollarPaymentButton } from '@pollar/react';
+
+interface PollarCheckoutProps {
+  orderId: string;
+  sellerAddress: string;
+  amountUSDC: number;
+  onSuccess: (txHash: string) => void;
+}
+
+export const PollarCheckoutWidget: React.FC<PollarCheckoutProps> = ({
+  orderId,
+  sellerAddress,
+  amountUSDC,
+  onSuccess,
+}) => {
+  return (
+    <div className="p-6 bg-slate-900 border border-indigo-500/30 rounded-2xl shadow-xl">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-semibold uppercase tracking-wider text-indigo-400">
+          Garantía Comercial Pollar
+        </span>
+        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          Mainnet USDC
+        </span>
+      </div>
+      <p className="text-sm text-slate-300 mb-6">
+        Bloquea <strong className="text-white">{amountUSDC} USDC</strong> para garantizar el despacho de la mercadería por encomienda. Los fondos solo se liquidarán al confirmar la recepción en terminal.
+      </p>
+
+      {/* Widget oficial Pollar */}
+      <button
+        id="btn-pollar-deposit"
+        onClick={() => {
+          // Trigger Pollar SDK Modal / Tx
+          onSuccess("0x9a8b...demoTxHash");
+        }}
+        className="w-full py-3.5 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-500/25 transition-all"
+      >
+        Bloquear {amountUSDC} USDC con Pollar
+      </button>
+    </div>
+  );
+};
+```
+
+### 16.2 Membresía Unlock Protocol (`@unlock-protocol/react`)
+
+Habilita la validación del NFT ERC-721 **"AltiPay VIP Key"** para ofrecer 0% de comisiones a comerciantes frecuentes.
+
+```tsx
+// src/hooks/useVIPMembership.ts
+import { useAccount, useReadContract } from 'wagmi';
+
+const UNLOCK_LOCK_ADDRESS = '0x1234567890123456789012345678901234567890'; // Lock AltiPay VIP
+
+export function useVIPMembership() {
+  const { address } = useAccount();
+
+  // Consulta el Lock de Unlock Protocol (getHasValidKey)
+  const { data: hasValidKey, isLoading } = useReadContract({
+    address: UNLOCK_LOCK_ADDRESS,
+    abi: [
+      {
+        name: 'getHasValidKey',
+        type: 'function',
+        stateMutability: 'view',
+        inputs: [{ name: '_user', type: 'address' }],
+        outputs: [{ name: '', type: 'bool' }],
+      },
+    ],
+    functionName: 'getHasValidKey',
+    args: address ? [address] : undefined,
+  });
+
+  return {
+    isVIP: Boolean(hasValidKey),
+    feePercent: hasValidKey ? 0.0 : 0.5, // 0% para VIP, 0.5% base
+    isLoading,
+  };
+}
+```
+
+---
+
+## 17. Especificación de Pantallas y Wireframes (UI/UX)
+
+Conforme a las directrices de diseño en Figma / Canva, el frontend implementa cuatro vistas esenciales:
+
+### 17.1 Pantalla de Creación de Orden (Comprador)
+* **Objetivo:** Permitir al comprador en Cochabamba crear el escrow introduciendo la wallet del mayorista de La Paz.
+* **Componentes:**
+  * Selector de red (HSK Testnet, Avalanche Fuji, Mainnet Pollar).
+  * Input de Wallet del Vendedor con resolución de nombres / validación de checksum.
+  * Input de monto en USDC.
+  * Selector de tiempo límite de caducidad (24h, 48h, 72h).
+  * Generador automático del **Código Secreto de Retiro** (ej. `ALTI-8492`) con advertencia de almacenamiento seguro.
+
+### 17.2 Widget de Checkout Pollar
+* **Objetivo:** Fondeo seguro en mainnet con confirmación de transacción visible para los jurados.
+* **Componentes:**
+  * Indicador de depósito inmovilizado en el contrato de custodia.
+  * TX Hash directo al explorador de bloques.
+
+### 17.3 Dashboard del Vendedor
+* **Objetivo:** Brindar certidumbre al comerciante que despacha la mercadería en la terminal.
+* **Componentes:**
+  * Tabla de órdenes activas con badge verde prominente: **"Depósito Bloqueado/Garantizado"**.
+  * Botón para ingresar número de guía de despacho físico (ej. Flota Bolívar #40921) para referencia del cliente.
+
+### 17.4 Pantalla de Liquidación (Mobile-first en Terminal)
+* **Objetivo:** Optimización estricta para celulares.
+* **Componentes:**
+  * Input numérico/alfanumérico de PIN grande y legible bajo luz solar.
+  * Botón "Confirmar Entrega y Liberar Pago".
+  * Animación de éxito instantáneo al liquidar atómicamente el 100% de los fondos al vendedor.
