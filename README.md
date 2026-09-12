@@ -139,7 +139,9 @@ Toda la especificación técnica completa se encuentra disponible en la carpeta 
 4. 🧪 [**ACCEPTANCE_SCENARIOS.md**](./docs/ACCEPTANCE_SCENARIOS.md): Escenarios de prueba BDD / Gherkin (Happy paths, cancelaciones, disputas y reembolsos).
 5. ⚙️ [**BACKEND_ARCHITECTURE.md**](./docs/BACKEND_ARCHITECTURE.md): Arquitectura de Smart Contracts (`AltiPayEscrow.sol`), modelo de gas, análisis STRIDE y scripts de despliegue.
 6. 💻 [**FRONTEND_ARCHITECTURE.md**](./docs/FRONTEND_ARCHITECTURE.md): Arquitectura Next.js 14, hooks Web3, widgets de Pollar y Unlock Protocol, y wireframes de interfaz.
-7. 👥 [**DISTRIBUCION_EQUIPO.md**](./DISTRIBUCION_EQUIPO.md): Plan de trabajo, división en 4 roles, matriz RACI, cronograma de sprints y asignación de bounties.
+7. 👥 [**DISTRIBUCION_EQUIPO.md**](./docs/DISTRIBUCION_EQUIPO.md): Plan de trabajo, división en 4 desarrolladores, matriz RACI y asignación de tareas.
+8. 🛡️ [**DEV_1_LUIS_SANDOVAL.md**](./docs/DEV_1_LUIS_SANDOVAL.md): Especificación técnica completa para el Desarrollador 1 (Smart Contracts, Foundry, Multichain y Handoffs).
+9. 📊 [**ESTADO_PROGRESO_MVP.md**](./docs/ESTADO_PROGRESO_MVP.md): Reporte de porcentajes de avance por desarrollador y estado global del MVP.
 
 ---
 

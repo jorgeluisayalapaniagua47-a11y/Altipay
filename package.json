@@ -1,0 +1,39 @@
+{
+  "name": "altipay-protocol",
+  "version": "1.0.0",
+  "description": "Infraestructura Descentralizada de Custodia Comercial y Encomiendas (PayFi)",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "deploy:mock:fuji": "hardhat run scripts/deploy-mock-usdc.ts --network avalancheFuji",
+    "deploy:mock:hsk": "hardhat run scripts/deploy-mock-usdc.ts --network hskTestnet",
+    "deploy:escrow:fuji": "hardhat run scripts/deploy-escrow.ts --network avalancheFuji",
+    "deploy:escrow:hsk": "hardhat run scripts/deploy-escrow.ts --network hskTestnet",
+    "export:artifacts": "ts-node scripts/export-artifacts.ts"
+  },
+  "keywords": [
+    "payfi",
+    "escrow",
+    "solidity",
+    "hardhat",
+    "avalanche",
+    "hsk-chain",
+    "pollar",
+    "unlock-protocol"
+  ],
+  "author": "Equipo AltiPay - Luis Sandoval (DEV 1)",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.2",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.7",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}

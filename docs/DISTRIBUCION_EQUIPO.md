@@ -55,6 +55,7 @@ graph TD
 ---
 
 ### 🧑‍💻 DESARROLLADOR 1: Smart Contracts & Blockchain Protocol Luis_Sandoval
+> **Guía Técnica Completa y Código:** 📄 [`docs/DEV_1_LUIS_SANDOVAL.md`](./DEV_1_LUIS_SANDOVAL.md)  
 > **Enfoque:** Lógica on-chain, seguridad criptográfica, pruebas unitarias y despliegue multichain.
 
 #### 📁 Archivos bajo su responsabilidad:
