@@ -52,7 +52,7 @@
 | **[TK-JORGE-03](#tk-jorge-03-hook-de-aprobación-balance-y-faucet-mockusdc)** | Hook de Aprobación, Balance y Faucet `MockUSDC` | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (100%)** | `hooks/useUSDC.ts` |
 | **[TK-JORGE-04](#tk-jorge-04-servicio-centralizado-de-transacciones-y-toasts)** | Servicio Centralizado de Transacciones & Toasts | **P1 (Core UX)** | 1.5 h | 🟢 **Done (100%)** | `services/transactionHandler.ts` |
 | **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟢 **Done (100%)** | `hooks/useUnlockVIP.ts`, `components/bounties/UnlockVIPBadge.tsx` |
-| **[TK-JORGE-06](#tk-jorge-06-bounty-pollar-mainnet-usdc-checkout-engine)** | [Bounty] Pollar Mainnet USDC Checkout Engine | **P1 (Bounty)** | 2.0 h | 🟡 **In Progress (80%)** | `components/bounties/PollarCheckoutButton.tsx` |
+| **[TK-JORGE-06](#tk-jorge-06-bounty-pollar-mainnet-usdc-checkout-engine)** | [Bounty] Pollar Mainnet USDC Checkout Engine | **P1 (Bounty)** | 2.0 h | 🟢 **Done (100%)** | `components/bounties/PollarCheckoutButton.tsx` |
 | **[TK-JORGE-07](#tk-jorge-07-integración-y-cableado-con-vistas-de-dev-3-y-dev-4)** | Integración y Cableado con Vistas de DEV 3 y DEV 4 | **P1 (Handoff)** | 3.0 h | 🟡 **In Progress (60%)** | `app/page.tsx`, `components/ui/button.tsx` |
 | **[TK-JORGE-08](#tk-jorge-08-pruebas-transaccionales-e2e-en-testnet)** | Pruebas Transaccionales E2E en Testnet (HSK / Fuji) | **P2 (QA)** | 2.0 h | 🔴 **Pending** | Consola dApp / Explorador de bloques |
 
@@ -193,9 +193,9 @@ Pollar premia proyectos que utilicen su protocolo para cobros/pagos en Mainnet.
 
 #### 📋 Criterios de Aceptación (DoD):
 * [x] Componente `PollarCheckoutButton.tsx` con diseño institucional, badge "Mainnet Ready" y cálculo de monto.
-* [x] Callback `onSuccess(txHash)` que notifica la orden fondeada.
-* [ ] **Pendiente:** Conectar el callback con el almacenamiento de la orden para que DEV 4 (vendedor) vea la orden en estado `FUNDED`.
-* [ ] **Pendiente:** Preparar toggle en `/create` para seleccionar: "Método de Pago: [MockUSDC Testnet] | [Pollar Mainnet]".
+* [x] Callback `onSuccess(data)` que notifica la orden fondeada y genera el Order ID.
+* [x] **Completado:** Conectado el callback con el almacenamiento local y de estado para que el vendedor vea la orden inmediatamente en estado `FUNDED` (Depósito Garantizado Pollar).
+* [x] **Completado:** Selector interactivo de método de pago en `/create`: `[AltiPay Escrow Testnet] | [Pollar Checkout Mainnet USDC]`.
 
 ---
 

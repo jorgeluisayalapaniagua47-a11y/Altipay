@@ -91,8 +91,9 @@ export default function HomePage() {
   const { isVIP, feePercent, calculateFee } = useUnlockVIP();
   const { createOrder, confirmDispatch, confirmDeliveryWithSecret, isSubmitting } = useAltiPayEscrow();
 
-  // Pestaña de navegación activa
+  // Pestaña de navegación activa y método de fondeo
   const [activeTab, setActiveTab] = useState<"dashboard" | "create" | "dispatch" | "release">("dashboard");
+  const [fundingMethod, setFundingMethod] = useState<"escrow" | "pollar">("escrow");
   const [searchQuery, setSearchQuery] = useState("");
 
   // Estados locales para el formulario de custodia
@@ -109,8 +110,59 @@ export default function HomePage() {
   const [trackingInfo, setTrackingInfo] = useState<string>("Flota Bolivar #40921");
   const [releasePin, setReleasePin] = useState<string>("ALTI-8492");
 
-  // Lista reactiva de órdenes
+  // Lista reactiva de órdenes con persistencia
   const [escrows, setEscrows] = useState<DemoEscrowItem[]>(initialDemoEscrows);
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem("altipay_escrows");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setEscrows(parsed);
+        }
+      }
+    } catch {}
+  }, []);
+
+  const saveEscrows = (newEscrows: DemoEscrowItem[]) => {
+    setEscrows(newEscrows);
+    try {
+      localStorage.setItem("altipay_escrows", JSON.stringify(newEscrows));
+    } catch {}
+  };
+
+  const handlePollarSuccess = (data: {
+    txHash: string;
+    orderId: string;
+    amountUSDC: string;
+    sellerAddress: string;
+    description: string;
+  }) => {
+    setActiveOrderId(data.orderId);
+
+    const newEscrow: DemoEscrowItem = {
+      id: `POL-${data.orderId.slice(2, 6).toUpperCase()}`,
+      title: data.description,
+      counterparty: `${data.sellerAddress.slice(0, 6)}...${data.sellerAddress.slice(-4)}`,
+      role: "Comprador",
+      amount: Number(data.amountUSDC).toLocaleString("en-US", { minimumFractionDigits: 2 }),
+      status: "Depósito Garantizado (Pollar Mainnet)",
+      tone: "green",
+      progress: 35,
+      date: "Garantía bloqueada en Mainnet",
+      initials: "PL",
+    };
+
+    saveEscrows([newEscrow, ...escrows]);
+    toast.success("¡Garantía comercial Pollar Mainnet fondeada exitosamente!", {
+      description: `Orden garantizada: ${data.orderId.slice(0, 10)}...`,
+      action: {
+        label: "Ver Etherscan",
+        onClick: () => window.open(`https://etherscan.io/tx/${data.txHash}`, "_blank"),
+      },
+    });
+  };
 
   const filteredEscrows = useMemo(() => {
     return escrows.filter((item) =>
@@ -537,6 +589,34 @@ export default function HomePage() {
                 </p>
               </div>
 
+              {/* Selector de Método de Fondeo (Bounties Integration) */}
+              <div className="p-1 rounded-xl bg-surface-darker border border-surface-border flex items-center gap-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setFundingMethod("escrow")}
+                  className={`flex-1 py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 ${
+                    fundingMethod === "escrow"
+                      ? "bg-brand-500 text-white shadow-sm shadow-brand-500/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>AltiPay Escrow (Testnet)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFundingMethod("pollar")}
+                  className={`flex-1 py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 ${
+                    fundingMethod === "pollar"
+                      ? "bg-indigo-600 text-white shadow-sm shadow-indigo-600/30"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Pollar Checkout (Mainnet USDC)</span>
+                </button>
+              </div>
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
@@ -622,31 +702,41 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleCreateOrder}
-                  isLoading={isSubmitting || isApproving}
-                  disabled={!isConnected}
-                  className="w-full"
-                  size="lg"
-                  variant="gradient"
-                >
-                  {isApproving
-                    ? "Aprobando USDC en tu wallet..."
-                    : isSubmitting
-                    ? "Bloqueando fondos en contrato..."
-                    : `Bloquear y Custodiar ${feeDetails.total.toFixed(2)} USDC`}
-                </Button>
+                {fundingMethod === "escrow" ? (
+                  <Button
+                    onClick={handleCreateOrder}
+                    isLoading={isSubmitting || isApproving}
+                    disabled={!isConnected}
+                    className="w-full"
+                    size="lg"
+                    variant="gradient"
+                  >
+                    {isApproving
+                      ? "Aprobando USDC en tu wallet..."
+                      : isSubmitting
+                      ? "Bloqueando fondos en contrato..."
+                      : `Bloquear y Custodiar ${feeDetails.total.toFixed(2)} USDC`}
+                  </Button>
+                ) : (
+                  <PollarCheckoutButton
+                    amountUSDC={amountUSDC}
+                    sellerAddress={sellerAddress}
+                    secretPin={secretPin}
+                    description={description}
+                    onSuccess={handlePollarSuccess}
+                  />
+                )}
               </div>
             </div>
 
-            {/* Columna Derecha: Bounty Pollar */}
+            {/* Columna Derecha: Detalles de Bounties y Seguridad */}
             <div className="space-y-6">
               <PollarCheckoutButton
                 amountUSDC={amountUSDC}
+                sellerAddress={sellerAddress}
+                secretPin={secretPin}
                 description={description}
-                onSuccess={(tx) => {
-                  toast.success(`Fondeo Pollar registrado: ${tx.slice(0, 10)}...`);
-                }}
+                onSuccess={handlePollarSuccess}
               />
 
               <div className="p-5 rounded-2xl bg-surface-card border border-surface-border space-y-3 text-xs text-slate-300">
@@ -655,10 +745,10 @@ export default function HomePage() {
                   ¿Cómo protege AltiPay al Comprador?
                 </h4>
                 <p className="leading-relaxed">
-                  1. Tus fondos se congelan en un contrato auditado de código abierto en <strong>HashKey Chain Testnet</strong>.
+                  1. Tus fondos se congelan de forma no custodial en un contrato auditado o en el motor <strong>Pollar Mainnet</strong>.
                 </p>
                 <p className="leading-relaxed">
-                  2. El transportista y el vendedor no pueden extraer los fondos a menos que entreguen el paquete y tú proporciones el PIN: <strong className="text-amber-300">{secretPin}</strong>.
+                  2. El transportista y el vendedor ven el depósito garantizado pero no pueden extraer los fondos a menos que entreguen el paquete y tú proporciones el PIN: <strong className="text-amber-300">{secretPin}</strong>.
                 </p>
                 <p className="leading-relaxed">
                   3. Si la mercadería no llega dentro de las 48 horas de plazo, el contrato te permite reclamar un reembolso total unilateralmente.
