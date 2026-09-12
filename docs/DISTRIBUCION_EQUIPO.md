@@ -85,6 +85,7 @@ graph TD
 ---
 
 ### ⚡ DESARROLLADOR 2: Web3 Core & SDK Integrations Jorge_Ayala
+> **Guía Técnica Completa y Tickets:** 📄 [`docs/DEV_2_JORGE_AYALA.md`](./DEV_2_JORGE_AYALA.md)  
 > **Enfoque:** Infraestructura Web3 en el cliente, integración de los SDKs de patrocinadores y gestión de transacciones.
 
 #### 📁 Archivos bajo su responsabilidad:
