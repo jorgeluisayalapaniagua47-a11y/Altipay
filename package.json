@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Infraestructura Descentralizada de Custodia Comercial y Encomiendas (PayFi)",
   "main": "index.js",
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",

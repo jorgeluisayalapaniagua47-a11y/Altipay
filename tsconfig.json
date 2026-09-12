@@ -13,6 +13,10 @@
     "./test",
     "./hardhat.config.ts"
   ],
+  "exclude": [
+    "frontend",
+    "node_modules"
+  ],
   "files": [
     "./hardhat.config.ts"
   ]
