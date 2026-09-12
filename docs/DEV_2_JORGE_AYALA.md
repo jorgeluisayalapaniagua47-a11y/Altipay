@@ -41,19 +41,19 @@
 ## 📊 2. Tablero de Tickets Técnicos (Sprint Hackathon)
 
 ### Resumen de Estados:
-* 🟢 **Completado (Done):** 2 tickets
-* 🟡 **En Progreso (In Progress):** 3 tickets
-* 🔴 **Por Iniciar (Pending):** 3 tickets
+* 🟢 **Completado (Done):** 4 tickets
+* 🟡 **En Progreso (In Progress):** 2 tickets
+* 🔴 **Por Iniciar (Pending):** 2 tickets
 
 | ID Ticket | Nombre del Ticket | Prioridad | Estimación | Estado | Archivos Principales |
 |---|---|:---:|:---:|:---:|---|
-| **[TK-JORGE-01](#tk-jorge-01-configuración-multichain-wagmi-v2--rainbowkit)** | Configuración Multichain Wagmi v2 & RainbowKit | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (90%)** | `config/wagmi.ts`, `components/web3/*` |
-| **[TK-JORGE-02](#tk-jorge-02-hooks-transaccionales-de-altipayescrow)** | Hooks Transaccionales de `AltiPayEscrow` | **P0 (Bloqueante)** | 2.5 h | 🟡 **In Progress (85%)** | `hooks/useAltiPayEscrow.ts`, `contracts/index.ts` |
-| **[TK-JORGE-03](#tk-jorge-03-hook-de-aprobación-balance-y-faucet-mockusdc)** | Hook de Aprobación, Balance y Faucet `MockUSDC` | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (95%)** | `hooks/useUSDC.ts` |
-| **[TK-JORGE-04](#tk-jorge-04-servicio-centralizado-de-transacciones-y-toasts)** | Servicio Centralizado de Transacciones & Toasts | **P1 (Core UX)** | 1.5 h | 🔴 **Pending** | `services/transactionHandler.ts` |
-| **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟡 **In Progress (75%)** | `hooks/useUnlockVIP.ts` |
-| **[TK-JORGE-06](#tk-jorge-06-bounty-pollar-mainnet-usdc-checkout-engine)** | [Bounty] Pollar Mainnet USDC Checkout Engine | **P1 (Bounty)** | 2.0 h | 🟡 **In Progress (70%)** | `components/bounties/PollarCheckoutButton.tsx` |
-| **[TK-JORGE-07](#tk-jorge-07-integración-y-cableado-con-vistas-de-dev-3-y-dev-4)** | Integración y Cableado con Vistas de DEV 3 y DEV 4 | **P1 (Handoff)** | 3.0 h | 🔴 **Pending** | `app/create/page.tsx`, `app/seller/page.tsx`, `app/order/[id]/page.tsx` |
+| **[TK-JORGE-01](#tk-jorge-01-configuración-multichain-wagmi-v2--rainbowkit)** | Configuración Multichain Wagmi v2 & RainbowKit | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (100%)** | `config/wagmi.ts`, `components/web3/*` |
+| **[TK-JORGE-02](#tk-jorge-02-hooks-transaccionales-de-altipayescrow)** | Hooks Transaccionales de `AltiPayEscrow` | **P0 (Bloqueante)** | 2.5 h | 🟢 **Done (95%)** | `hooks/useAltiPayEscrow.ts`, `contracts/index.ts` |
+| **[TK-JORGE-03](#tk-jorge-03-hook-de-aprobación-balance-y-faucet-mockusdc)** | Hook de Aprobación, Balance y Faucet `MockUSDC` | **P0 (Bloqueante)** | 1.5 h | 🟢 **Done (100%)** | `hooks/useUSDC.ts` |
+| **[TK-JORGE-04](#tk-jorge-04-servicio-centralizado-de-transacciones-y-toasts)** | Servicio Centralizado de Transacciones & Toasts | **P1 (Core UX)** | 1.5 h | 🟢 **Done (100%)** | `services/transactionHandler.ts` |
+| **[TK-JORGE-05](#tk-jorge-05-bounty-unlock-protocol-hook-y-badge-vip)** | [Bounty] Unlock Protocol Hook & Badge VIP | **P1 (Bounty)** | 2.0 h | 🟢 **Done (95%)** | `hooks/useUnlockVIP.ts`, `components/bounties/UnlockVIPBadge.tsx` |
+| **[TK-JORGE-06](#tk-jorge-06-bounty-pollar-mainnet-usdc-checkout-engine)** | [Bounty] Pollar Mainnet USDC Checkout Engine | **P1 (Bounty)** | 2.0 h | 🟡 **In Progress (80%)** | `components/bounties/PollarCheckoutButton.tsx` |
+| **[TK-JORGE-07](#tk-jorge-07-integración-y-cableado-con-vistas-de-dev-3-y-dev-4)** | Integración y Cableado con Vistas de DEV 3 y DEV 4 | **P1 (Handoff)** | 3.0 h | 🟡 **In Progress (60%)** | `app/page.tsx`, `components/ui/button.tsx` |
 | **[TK-JORGE-08](#tk-jorge-08-pruebas-transaccionales-e2e-en-testnet)** | Pruebas Transaccionales E2E en Testnet (HSK / Fuji) | **P2 (QA)** | 2.0 h | 🔴 **Pending** | Consola dApp / Explorador de bloques |
 
 ---
