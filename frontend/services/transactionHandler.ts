@@ -60,6 +60,8 @@ export function handleTxError(error: any, fallbackMessage: string = 'Transacció
       message = 'La fecha límite debe ser futura'
     } else if (error.message.includes('Buyer cannot be seller')) {
       message = 'El comprador y el vendedor no pueden ser la misma dirección'
+    } else if (error.message.includes('Requested resource not available') || error.message.includes('RPC endpoint returned too many errors')) {
+      message = 'No se pudo conectar a la red seleccionada (Hardhat). Por favor cambia tu billetera a Avalanche Fuji o inicia "npx hardhat node".'
     } else if (error.shortMessage) {
       message = error.shortMessage
     }

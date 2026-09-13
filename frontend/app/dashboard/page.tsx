@@ -5,7 +5,8 @@ import { useMemo, useState } from 'react'
 import {
   ArrowDownLeft, ArrowUpRight, ArrowLeft, Bell, Check, ChevronRight, CircleHelp, Clock3,
   ExternalLink, FileText, LayoutDashboard, LifeBuoy, Menu, MoreHorizontal, Plus,
-  Search, ShieldCheck, Sparkles, Wallet, X, Zap, KeyRound, Truck, AlertCircle
+  Search, ShieldCheck, Sparkles, Wallet, X, Zap, KeyRound, Truck, AlertCircle,
+  Share2, Copy
 } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { ConnectWalletButton } from '@/components/web3/ConnectWalletButton'
@@ -729,6 +730,26 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* Acciones de comprobante y WhatsApp */}
+            <div className="mt-4 pt-4 border-t border-border flex flex-wrap gap-2">
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/order/${selected.orderId}`
+                  const text = `Sigue el estado de tu encomienda protegida con AltiPay (${selected.description || selected.title}) por ${selected.formattedAmount} USDC: ${url}`
+                  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+                }}
+                className="flex items-center gap-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-2 text-xs font-semibold text-emerald-300 hover:bg-emerald-500/25 transition"
+              >
+                <Share2 className="size-3.5" /> Compartir por WhatsApp
+              </button>
+              <Link
+                href={`/order/${selected.orderId}`}
+                className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3.5 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition"
+              >
+                <ExternalLink className="size-3.5" /> Ver comprobante de rastreo
+              </Link>
+            </div>
           </div>
         </Modal>
       )}
