@@ -7,6 +7,19 @@ import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
 import { config } from '@/config/wagmi'
 import '@rainbow-me/rainbowkit/styles.css'
 
+// Filter Reown cloud allowlist warning from triggering Next.js dev error overlay
+if (typeof window !== 'undefined') {
+  const origError = console.error
+  console.error = (...args) => {
+    const first = args[0]
+    if (typeof first === 'string' && (first.includes('cloud.reown.com') || first.includes('not found on Allowlist'))) {
+      console.warn('[WalletConnect / Reown Notice]:', ...args)
+      return
+    }
+    origError(...args)
+  }
+}
+
 export function Web3Provider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
