@@ -191,6 +191,10 @@ export default function DashboardPage() {
   // Release funds with secret
   const handleReleaseWithPin = async () => {
     if (!selected) return
+    if (selected.orderId.endsWith('00000000000000000000000000000001') || selected.orderId.endsWith('00000000000000000000000000000002')) {
+      toast.info('Esta es una orden de muestra visual (demo). Para probar el flujo en blockchain, crea una custodia real con "+ Nueva custodia".')
+      return
+    }
     if (!inputPin.trim()) {
       toast.error('Ingresa el PIN de liberación')
       return
@@ -205,6 +209,10 @@ export default function DashboardPage() {
   // Confirm dispatch with tracking
   const handleConfirmDispatch = async () => {
     if (!selected) return
+    if (selected.orderId.endsWith('00000000000000000000000000000001') || selected.orderId.endsWith('00000000000000000000000000000002')) {
+      toast.info('Esta es una orden de muestra visual (demo). Para probar el flujo en blockchain, crea una custodia real con "+ Nueva custodia".')
+      return
+    }
     if (!inputTracking.trim()) {
       toast.error('Ingresa el número de guía o flota')
       return

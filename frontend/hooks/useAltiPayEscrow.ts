@@ -142,6 +142,9 @@ export function useAltiPayEscrow() {
         toast.loading('Confirmando custodia en blockchain...', { id: 'escrow-create' })
         const receipt = await publicClient.waitForTransactionReceipt({ hash })
         toast.dismiss('escrow-create')
+        if (receipt.status === 'reverted') {
+          throw new Error('La transacción de creación de custodia fue rechazada en blockchain')
+        }
 
         for (const log of receipt.logs) {
           try {
@@ -217,8 +220,11 @@ export function useAltiPayEscrow() {
 
       if (publicClient) {
         toast.loading('Confirmando guía de despacho...', { id: 'escrow-dispatch' })
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
         toast.dismiss('escrow-dispatch')
+        if (receipt.status === 'reverted') {
+          throw new Error('La transacción de despacho fue rechazada en blockchain')
+        }
       }
 
       handleTxSuccess('¡Guía de flota registrada en blockchain!', hash, activeChainId)
@@ -274,8 +280,11 @@ export function useAltiPayEscrow() {
 
       if (publicClient) {
         toast.loading('Liberando fondos al vendedor...', { id: 'escrow-release' })
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
         toast.dismiss('escrow-release')
+        if (receipt.status === 'reverted') {
+          throw new Error('La transacción fue rechazada por el contrato (Reverted). Verifica que la orden exista on-chain y el PIN sea el correcto.')
+        }
       }
 
       handleTxSuccess('¡Fondos liberados con éxito al vendedor!', hash, activeChainId, true)
@@ -329,8 +338,11 @@ export function useAltiPayEscrow() {
 
       if (publicClient) {
         toast.loading('Procesando reembolso en la blockchain...', { id: 'escrow-refund' })
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
         toast.dismiss('escrow-refund')
+        if (receipt.status === 'reverted') {
+          throw new Error('La transacción de reembolso fue rechazada en blockchain')
+        }
       }
 
       handleTxSuccess('¡Reembolso completado exitosamente!', hash, activeChainId)

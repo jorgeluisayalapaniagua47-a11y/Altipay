@@ -74,8 +74,11 @@ export function useUSDC() {
 
       if (publicClient) {
         toast.loading('Confirmando aprobación en la blockchain...', { id: 'usdc-approve' })
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
         toast.dismiss('usdc-approve')
+        if (receipt.status === 'reverted') {
+          throw new Error('La transacción de aprobación fue rechazada en blockchain')
+        }
       }
 
       handleTxSuccess('USDC aprobado para custodia', hash, activeChainId)
@@ -111,8 +114,11 @@ export function useUSDC() {
 
       if (publicClient) {
         toast.loading('Acreditando tokens en tu billetera...', { id: 'usdc-faucet' })
-        await publicClient.waitForTransactionReceipt({ hash })
+        const receipt = await publicClient.waitForTransactionReceipt({ hash })
         toast.dismiss('usdc-faucet')
+        if (receipt.status === 'reverted') {
+          throw new Error('La transacción del faucet fue rechazada en blockchain')
+        }
       }
 
       handleTxSuccess(`¡${amount} MockUSDC acreditados con éxito!`, hash, activeChainId, true)
