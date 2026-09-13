@@ -7,7 +7,13 @@ const nextConfig = {
     unoptimized: true,
   },
   webpack: (config) => {
-    config.externals.push('pino-pretty', 'lokijs', 'encoding')
+    config.externals.push(
+      'pino-pretty', 
+      'lokijs', 
+      'encoding',
+      '@x402/svm/exact/client',
+      '@x402/core/client'
+    )
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
