@@ -6,8 +6,18 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  serverExternalPackages: [
+    '@coinbase/cdp-sdk',
+    'pino-pretty',
+    'lokijs',
+    'encoding',
+  ],
   webpack: (config) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding')
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@coinbase/cdp-sdk': false,
+    }
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
