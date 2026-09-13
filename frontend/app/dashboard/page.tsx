@@ -108,7 +108,7 @@ export default function DashboardPage() {
   }, [userOrders])
 
   const [mobileNav, setMobileNav] = useState(false)
-  const [section, setSection] = useState('Overview')
+  const [section, setSection] = useState('Resumen')
   const [query, setQuery] = useState('')
   const [modal, setModal] = useState<'create' | 'dispute' | null>(null)
   const [selected, setSelected] = useState<EscrowOrderItem | null>(null)
@@ -241,14 +241,14 @@ export default function DashboardPage() {
 
         <div className="mt-10 flex flex-1 flex-col">
           <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
-            Workspace
+            Área de trabajo
           </p>
           <nav className="space-y-1" aria-label="Navegación principal">
             {[
-              ['Overview', LayoutDashboard],
-              ['My escrows', FileText],
-              ['Wallet', Wallet],
-              ['Disputes', LifeBuoy],
+              ['Resumen', LayoutDashboard],
+              ['Mis custodias', FileText],
+              ['Billetera', Wallet],
+              ['Disputas', LifeBuoy],
             ].map(([label, Icon]) => (
               <button
                 key={label as string}
@@ -261,8 +261,8 @@ export default function DashboardPage() {
               >
                 <Icon className="size-[17px]" />
                 <span className="flex-1">{label as string}</span>
-                {label === 'My escrows' && <span className="text-[10px] opacity-80">{allEscrows.length}</span>}
-                {label === 'Disputes' && (
+                {label === 'Mis custodias' && <span className="text-[10px] opacity-80">{allEscrows.length}</span>}
+                {label === 'Disputas' && (
                   <span className="rounded-md bg-amber-400/10 px-1.5 py-0.5 text-[10px] text-amber-300">1</span>
                 )}
               </button>
@@ -379,13 +379,13 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {section === 'My escrows' ? (
+          {section === 'Mis custodias' ? (
             <EscrowsView
               escrows={filtered}
               onSelect={setSelected}
               onCreate={() => setModal('create')}
             />
-          ) : section === 'Wallet' ? (
+          ) : section === 'Billetera' ? (
             <WalletView
               balance={balance}
               address={address}
@@ -393,7 +393,7 @@ export default function DashboardPage() {
               onRequestFaucet={() => requestFaucet('100')}
               isMinting={isMinting}
             />
-          ) : section === 'Disputes' ? (
+          ) : section === 'Disputas' ? (
             <DisputesView onOpen={() => setModal('dispute')} />
           ) : (
             <>
@@ -436,7 +436,7 @@ export default function DashboardPage() {
                       <p className="mt-1 text-xs text-muted-foreground">Monitorea los hitos de despacho y liberación</p>
                     </div>
                     <button
-                      onClick={() => nav('My escrows')}
+                      onClick={() => nav('Mis custodias')}
                       className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                     >
                       Ver todos <ChevronRight className="size-3.5" />
